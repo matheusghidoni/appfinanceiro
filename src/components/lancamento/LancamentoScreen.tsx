@@ -4,7 +4,6 @@ import { useState } from "react";
 import { MESES } from "@/lib/constants";
 import { brl } from "@/lib/utils";
 import { useLancamento } from "@/hooks/useLancamento";
-import { ToastProvider } from "@/components/ui/Toast";
 import GastosFixosTable from "./GastosFixosTable";
 import GastosVariadosTable from "./GastosVariadosTable";
 import EntradasTable from "./EntradasTable";
@@ -32,8 +31,7 @@ export default function LancamentoScreen() {
   const anos = Array.from({ length: 8 }, (_, i) => curAno - 3 + i);
 
   return (
-    <ToastProvider>
-      <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden">
         {/* Header */}
         <div className="bg-card border-b border-border px-6 h-[60px] flex items-center justify-between flex-shrink-0">
           <h1 className="text-[17px] font-bold text-navy">Lançamento Mensal</h1>
@@ -81,8 +79,7 @@ export default function LancamentoScreen() {
             </div>
           )}
         </div>
-      </div>
-    </ToastProvider>
+    </div>
   );
 }
 

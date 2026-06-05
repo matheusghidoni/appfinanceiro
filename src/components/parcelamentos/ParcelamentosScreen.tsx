@@ -3,17 +3,13 @@
 import { useState } from "react";
 import { brl } from "@/lib/utils";
 import { useParcelamentos } from "@/hooks/useParcelamentos";
-import { ToastProvider, useToast } from "@/components/ui/Toast";
+import { useToast } from "@/components/ui/Toast";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import ParcelModal from "./ParcelModal";
 import type { Parcelamento } from "@/types";
 
 export default function ParcelamentosScreen() {
-  return (
-    <ToastProvider>
-      <Inner />
-    </ToastProvider>
-  );
+  return <Inner />;
 }
 
 function Inner() {
