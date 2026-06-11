@@ -33,20 +33,20 @@ export default function LancamentoScreen() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
         {/* Header */}
-        <div className="bg-card border-b border-border px-6 h-[60px] flex items-center justify-between flex-shrink-0">
-          <h1 className="text-[17px] font-bold text-navy">Lançamento Mensal</h1>
-          <div className="flex items-center gap-2.5">
+        <div className="bg-card border-b border-border px-4 md:px-6 h-[60px] flex items-center justify-between gap-2 flex-shrink-0">
+          <h1 className="text-[15px] md:text-[17px] font-bold text-heading">Lançamento Mensal</h1>
+          <div className="flex items-center gap-2 md:gap-2.5">
             <select
               value={mes}
               onChange={e => setMes(e.target.value)}
-              className="border-[1.5px] border-border rounded-lg px-2.5 py-1.5 font-sans text-[13px] font-medium bg-bg text-apptext cursor-pointer outline-none focus:border-navy"
+              className="border-[1.5px] border-border rounded-lg px-2.5 py-1.5 font-sans text-[13px] font-medium bg-bg text-apptext cursor-pointer outline-none focus:border-accent"
             >
               {MESES.map(m => <option key={m}>{m}</option>)}
             </select>
             <select
               value={ano}
               onChange={e => setAno(parseInt(e.target.value))}
-              className="border-[1.5px] border-border rounded-lg px-2.5 py-1.5 font-sans text-[13px] font-medium bg-bg text-apptext cursor-pointer outline-none focus:border-navy"
+              className="border-[1.5px] border-border rounded-lg px-2.5 py-1.5 font-sans text-[13px] font-medium bg-bg text-apptext cursor-pointer outline-none focus:border-accent"
             >
               {anos.map(y => <option key={y}>{y}</option>)}
             </select>
@@ -54,7 +54,7 @@ export default function LancamentoScreen() {
         </div>
 
         {/* Summary Bar */}
-        <div className="bg-card border-b border-border px-6 py-3 flex gap-3 flex-shrink-0 flex-wrap">
+        <div className="bg-card border-b border-border px-4 md:px-6 py-3 flex gap-2 md:gap-3 flex-shrink-0 flex-wrap">
           <SumCard label="Receita Real" value={brl(totalReceita)} color="bg-ent" />
           <SumCard label="Total Gastos" value={brl(totalGastos)} color="bg-var" />
           <SumCard
@@ -65,7 +65,7 @@ export default function LancamentoScreen() {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 pb-8 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-3 md:px-6 py-4 pb-8 scrollbar-thin">
           {loading ? (
             <div className="flex items-center justify-center h-40 text-muted text-sm">
               Carregando…

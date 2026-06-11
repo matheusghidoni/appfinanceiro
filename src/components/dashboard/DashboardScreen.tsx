@@ -14,11 +14,11 @@ export default function DashboardScreen() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="bg-card border-b border-border px-6 h-[60px] flex items-center flex-shrink-0">
-        <h1 className="text-[17px] font-bold text-navy">Dashboard Histórico</h1>
+      <div className="bg-card border-b border-border px-4 md:px-6 h-[60px] flex items-center flex-shrink-0">
+        <h1 className="text-[15px] md:text-[17px] font-bold text-heading">Dashboard Histórico</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-3 md:px-6 py-5 scrollbar-thin">
         {loading ? (
           <div className="flex items-center justify-center h-40 text-muted text-sm">Carregando…</div>
         ) : (
@@ -34,7 +34,7 @@ export default function DashboardScreen() {
             <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-4">
               {/* Bar chart */}
               <div className="bg-card border border-border rounded-xl p-4">
-                <h4 className="text-[13px] font-bold text-navy mb-3.5">Receita vs Gastos por mês</h4>
+                <h4 className="text-[13px] font-bold text-heading mb-3.5">Receita vs Gastos por mês</h4>
                 {historico.length === 0 ? (
                   <div className="h-40 flex items-center justify-center text-muted text-[13px]">Nenhum lançamento ainda.</div>
                 ) : (
@@ -72,7 +72,7 @@ export default function DashboardScreen() {
 
               {/* History table */}
               <div className="bg-card border border-border rounded-xl p-4">
-                <h4 className="text-[13px] font-bold text-navy mb-3.5">Histórico mensal</h4>
+                <h4 className="text-[13px] font-bold text-heading mb-3.5">Histórico mensal</h4>
                 {historico.length === 0 ? (
                   <div className="text-center text-muted text-[12px] py-5">Sem dados</div>
                 ) : (
@@ -86,11 +86,11 @@ export default function DashboardScreen() {
                     </thead>
                     <tbody>
                       {[...historico].reverse().map(d => (
-                        <tr key={d.key} className="hover:bg-[#F0F4FF]">
+                        <tr key={d.key} className="hover:bg-rowhover">
                           <td className="font-sans font-semibold text-[12px] py-2 pl-1 border-b border-border">{d.label}</td>
                           <td className="font-mono text-[12px] py-2 text-right border-b border-border">{brl(d.rec)}</td>
                           <td className="font-mono text-[12px] py-2 text-right border-b border-border">{brl(d.gas)}</td>
-                          <td className={`font-mono text-[12px] py-2 text-right border-b border-border ${d.res >= 0 ? "text-[#15803d]" : "text-vermelho"}`}>{brl(d.res)}</td>
+                          <td className={`font-mono text-[12px] py-2 text-right border-b border-border ${d.res >= 0 ? "text-[#15803d] dark:text-[#7ED957]" : "text-vermelho"}`}>{brl(d.res)}</td>
                         </tr>
                       ))}
                     </tbody>

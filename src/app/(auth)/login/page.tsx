@@ -32,7 +32,7 @@ export default function LoginPage() {
       <div className="bg-card border border-border rounded-2xl p-8 w-full max-w-sm shadow-lg">
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">💰</div>
-          <h1 className="text-xl font-bold text-navy">Controle Financeiro</h1>
+          <h1 className="text-xl font-bold text-heading">Controle Financeiro</h1>
           <p className="text-sm text-muted mt-1">Entre na sua conta</p>
         </div>
 
@@ -44,7 +44,7 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="w-full border-[1.5px] border-border rounded-lg px-3 py-2 text-sm font-sans outline-none focus:border-navy bg-bg"
+              className="w-full border-[1.5px] border-border rounded-lg px-3 py-2 text-sm font-sans outline-none focus:border-accent bg-bg"
               placeholder="seu@email.com"
             />
           </div>
@@ -55,13 +55,13 @@ export default function LoginPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              className="w-full border-[1.5px] border-border rounded-lg px-3 py-2 text-sm font-sans outline-none focus:border-navy bg-bg"
+              className="w-full border-[1.5px] border-border rounded-lg px-3 py-2 text-sm font-sans outline-none focus:border-accent bg-bg"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <p className="text-vermelho text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <p className="text-vermelho text-sm bg-red-50 border border-red-200 dark:bg-vermelho/10 dark:border-vermelho/40 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
@@ -77,7 +77,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-muted mt-6">
           Não tem conta?{" "}
-          <Link href="/signup" className="text-navy font-semibold hover:underline">
+          <Link href="/signup" className="text-heading font-semibold hover:underline">
             Cadastrar
           </Link>
         </p>

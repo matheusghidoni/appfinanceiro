@@ -46,7 +46,7 @@ export default function ParcelModal({ open, initial, onSave, onDelete, onClose }
 
   return (
     <Modal open={open} onClose={onClose}>
-      <h3 className="text-base font-bold text-navy mb-5">{initial ? "Editar Parcelamento" : "Novo Parcelamento"}</h3>
+      <h3 className="text-base font-bold text-heading mb-5">{initial ? "Editar Parcelamento" : "Novo Parcelamento"}</h3>
       <div className="space-y-2.5">
         {[
           { label: "Cliente", el: <input value={cliente} onChange={e => setCliente(e.target.value)} className={fieldCls} /> },
@@ -85,4 +85,4 @@ export default function ParcelModal({ open, initial, onSave, onDelete, onClose }
   );
 }
 
-const fieldCls = "border-[1.5px] border-border rounded-lg px-2.5 py-2 font-sans text-[13px] outline-none w-full focus:border-navy";
+const fieldCls = "border-[1.5px] border-border rounded-lg px-2.5 py-2 font-sans text-[13px] bg-bg text-apptext outline-none w-full focus:border-accent";

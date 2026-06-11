@@ -21,10 +21,14 @@ export const metadata: Metadata = {
   description: "Controle financeiro pessoal",
 };
 
+// Aplica o tema salvo antes da primeira pintura para evitar flash claro/escuro
+const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${dmSans.variable} ${dmMono.variable} bg-bg text-apptext font-sans antialiased`}>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         {children}
       </body>
     </html>

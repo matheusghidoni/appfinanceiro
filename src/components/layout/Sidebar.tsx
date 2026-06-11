@@ -1,12 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { useToast } from "@/components/ui/Toast";
+import { usePathname } from "next/navigation";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { useExportImport } from "@/hooks/useExportImport";
+import { useDataControls } from "@/hooks/useDataControls";
+import { useTheme } from "@/hooks/useTheme";
 
 interface Props { userEmail: string; }
 
@@ -16,81 +14,14 @@ const NAV = [
   { href: "/dashboard",     icon: "📊", label: "Dashboard" },
 ];
 
-type ConfirmAction = "restore" | "reset" | null;
-
 export default function Sidebar({ userEmail }: Props) {
-  const pathname  = usePathname();
-  const router    = useRouter();
-  const supabase  = createClient();
-  const { show: toast } = useToast();
-  const { exportarExcel, exportarJSON, restaurarJSON, apagarTudo } = useExportImport();
-  const fileRef   = useRef<HTMLInputElement>(null);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [confirm, setConfirm] = useState<ConfirmAction>(null);
-  const [busy, setBusy] = useState(false);
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  }
-
-  async function handleExcelClick() {
-    setBusy(true);
-    try {
-      await exportarExcel();
-      toast("Excel exportado!");
-    } catch (e) {
-      toast("Erro ao exportar: " + (e as Error).message, true);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleJSONClick() {
-    setBusy(true);
-    try {
-      await exportarJSON();
-      toast("Backup gerado!");
-    } catch (e) {
-      toast("Erro: " + (e as Error).message, true);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  function handleRestoreClick() {
-    fileRef.current?.click();
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPendingFile(file);
-    setConfirm("restore");
-    e.target.value = "";
-  }
-
-  async function handleConfirm() {
-    setConfirm(null);
-    setBusy(true);
-    try {
-      if (confirm === "restore" && pendingFile) {
-        await restaurarJSON(pendingFile);
-        setPendingFile(null);
-        toast("Backup restaurado!");
-        window.location.reload();
-      } else if (confirm === "reset") {
-        await apagarTudo();
-        toast("Dados apagados");
-        window.location.reload();
-      }
-    } catch (e) {
-      toast("Erro: " + (e as Error).message, true);
-    } finally {
-      setBusy(false);
-    }
-  }
+  const pathname = usePathname();
+  const { dark, toggle } = useTheme();
+  const {
+    busy, confirm, setConfirm, fileRef,
+    handleSignOut, handleExcelClick, handleJSONClick,
+    handleRestoreClick, handleFileChange, handleConfirm, cancelConfirm,
+  } = useDataControls();
 
   return (
     <>
@@ -124,6 +55,7 @@ export default function Sidebar({ userEmail }: Props) {
         </nav>
 
         <div className="py-2 border-t border-white/[.08] flex flex-col gap-0.5">
+          <SidebarBtn onClick={toggle} label={dark ? "☀️ Modo claro" : "🌙 Modo escuro"} />
           <SidebarBtn onClick={handleExcelClick} label="📥 Exportar Excel"   disabled={busy} />
           <SidebarBtn onClick={handleJSONClick}  label="💾 Backup (JSON)"    disabled={busy} />
           <SidebarBtn onClick={handleRestoreClick} label="📂 Restaurar Backup" disabled={busy} />
@@ -151,7 +83,7 @@ export default function Sidebar({ userEmail }: Props) {
         title="Restaurar backup?"
         message="Todos os dados atuais serão substituídos pelos dados do arquivo. Esta ação não pode ser desfeita."
         onConfirm={handleConfirm}
-        onCancel={() => { setConfirm(null); setPendingFile(null); }}
+        onCancel={cancelConfirm}
       />
 
       {/* Confirm: reset */}
@@ -160,7 +92,7 @@ export default function Sidebar({ userEmail }: Props) {
         title="Apagar todos os dados?"
         message="Todos os lançamentos e parcelamentos serão apagados permanentemente. Faça um backup antes."
         onConfirm={handleConfirm}
-        onCancel={() => setConfirm(null)}
+        onCancel={cancelConfirm}
       />
     </>
   );

@@ -6,6 +6,7 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       fontFamily: {
@@ -22,11 +23,18 @@ const config: Config = {
         verde:   "#70AD47",
         vermelho:"#C00000",
         amarelo: "#FFC000",
-        bg:      "#F0F2F8",
-        card:    "#FFFFFF",
-        border:  "#E2E6F0",
-        apptext: "#1a1f36",
-        muted:   "#6b7280",
+        // Tokens semânticos — mudam conforme o tema (ver globals.css)
+        bg:       "var(--c-bg)",
+        card:     "var(--c-card)",
+        border:   "var(--c-border)",
+        apptext:  "var(--c-text)",
+        muted:    "var(--c-muted)",
+        thead:    "var(--c-thead)",
+        roweven:  "var(--c-row-even)",
+        rowhover: "var(--c-row-hover)",
+        subtotal: "var(--c-subtotal)",
+        heading:  "var(--c-heading)",
+        accent:   "var(--c-accent)",
       },
     },
   },

@@ -22,7 +22,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl text-white text-[13px] font-medium shadow-2xl z-[9999] pointer-events-none transition-all duration-[250ms] ${
           state.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-        } ${state.err ? "bg-vermelho" : "bg-[#1a1f36]"}`}
+        } ${state.err ? "bg-vermelho" : "bg-[#1a1f36] dark:bg-[#2E3A5C]"}`}
       >
         {state.msg}
       </div>

@@ -24,7 +24,7 @@ export default function Modal({ open, onClose, children, width = "440px" }: Prop
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="bg-white rounded-2xl px-7 pt-7 pb-6 shadow-[0_20px_60px_rgba(0,0,0,.25)] max-w-[95vw]"
+        className="bg-card rounded-2xl px-7 pt-7 pb-6 shadow-[0_20px_60px_rgba(0,0,0,.25)] max-w-[calc(100vw-32px)]"
         style={{ width }}
       >
         {children}
