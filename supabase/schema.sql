@@ -61,9 +61,22 @@ CREATE TABLE IF NOT EXISTS parcelamentos (
   num_parcelas    INTEGER NOT NULL DEFAULT 1,
   parcelas_pagas  INTEGER NOT NULL DEFAULT 0,
   situacao        TEXT NOT NULL DEFAULT 'Ativo',
+  mes_inicial     TEXT NOT NULL DEFAULT '',
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migrações para bancos já existentes (idempotentes).
+-- Mês/ano da 1ª parcela (formato "MM-YYYY"), base para espalhar as parcelas nos meses.
+ALTER TABLE parcelamentos ADD COLUMN IF NOT EXISTS mes_inicial TEXT NOT NULL DEFAULT '';
+
+-- Vínculo da entrada ao parcelamento de origem (auto-lançamento de parcelas).
+-- ON DELETE SET NULL: ao excluir o parcelamento a entrada não some sozinha;
+-- a lógica do app decide o que apagar (não recebidas) ou preservar (recebidas).
+ALTER TABLE entradas ADD COLUMN IF NOT EXISTS parcelamento_id UUID
+  REFERENCES parcelamentos(id) ON DELETE SET NULL;
+ALTER TABLE entradas ADD COLUMN IF NOT EXISTS parcela_num INTEGER;
+CREATE INDEX IF NOT EXISTS idx_entradas_parcelamento ON entradas(parcelamento_id);
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_gastos_fixos_user_mes    ON gastos_fixos(user_id, mes_ano);

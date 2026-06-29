@@ -38,6 +38,8 @@ interface Props {
   chipTone?: ChipTone;
   onChipTap?: () => void;
   onDelete: () => void;
+  disableDelete?: boolean; // desativa o swipe-para-excluir (ex: parcelas geradas)
+  badge?: React.ReactNode;  // marcador opcional ao lado do título (ex: 🔗)
   children: React.ReactNode; // editor exibido ao expandir
 }
 
@@ -49,7 +51,7 @@ const REVEAL_W = 88; // largura da área "Excluir" revelada pelo swipe
  */
 export default function MobileItemCard({
   title, titlePlaceholder = "Sem descrição", subtitle, value,
-  chip, chipTone = "neutral", onChipTap, onDelete, children,
+  chip, chipTone = "neutral", onChipTap, onDelete, disableDelete = false, badge, children,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -85,6 +87,7 @@ export default function MobileItemCard({
     }
     if (axis.current === "v") return;
     moved.current = true;
+    if (disableDelete) return; // sem swipe-para-excluir neste card
     setOffsetSync(Math.min(0, Math.max(-REVEAL_W, start.current.base + dx)));
   }
 
@@ -112,16 +115,18 @@ export default function MobileItemCard({
   return (
     <div className="relative overflow-hidden rounded-xl border border-border bg-card">
       {/* Área de excluir, revelada pelo swipe */}
-      <button
-        onClick={onDelete}
-        tabIndex={revealed ? 0 : -1}
-        aria-hidden={!revealed}
-        className="absolute inset-y-0 right-0 flex flex-col items-center justify-center gap-0.5 bg-vermelho text-white text-[11px] font-semibold"
-        style={{ width: REVEAL_W }}
-      >
-        <span className="text-base">🗑️</span>
-        Excluir
-      </button>
+      {!disableDelete && (
+        <button
+          onClick={onDelete}
+          tabIndex={revealed ? 0 : -1}
+          aria-hidden={!revealed}
+          className="absolute inset-y-0 right-0 flex flex-col items-center justify-center gap-0.5 bg-vermelho text-white text-[11px] font-semibold"
+          style={{ width: REVEAL_W }}
+        >
+          <span className="text-base">🗑️</span>
+          Excluir
+        </button>
+      )}
 
       {/* Conteúdo deslizante */}
       <div
@@ -133,8 +138,9 @@ export default function MobileItemCard({
       >
         <div className="flex items-center gap-2.5 px-3.5 py-3" onClick={handleTap}>
           <div className="flex-1 min-w-0">
-            <div className={`text-[13px] font-semibold truncate ${title ? "" : "text-muted font-normal italic"}`}>
-              {title || titlePlaceholder}
+            <div className={`text-[13px] font-semibold truncate flex items-center gap-1 ${title ? "" : "text-muted font-normal italic"}`}>
+              {badge}
+              <span className="truncate">{title || titlePlaceholder}</span>
             </div>
             {subtitle && <div className="text-[11px] text-muted truncate mt-0.5">{subtitle}</div>}
           </div>

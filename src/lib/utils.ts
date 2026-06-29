@@ -14,6 +14,15 @@ export function mesLabel(key: string): string {
   return MESES[parseInt(mn) - 1].slice(0, 3) + "/" + an.slice(2);
 }
 
+// Soma n meses (n pode ser negativo) a uma chave "MM-YYYY" e devolve outra "MM-YYYY".
+export function addMonths(key: string, n: number): string {
+  const [mn, an] = key.split("-").map(Number);
+  const total = (an * 12 + (mn - 1)) + n;
+  const ano = Math.floor(total / 12);
+  const mes = (total % 12) + 1;
+  return String(mes).padStart(2, "0") + "-" + ano;
+}
+
 export function brl(value: number): string {
   return "R$ " + value.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }

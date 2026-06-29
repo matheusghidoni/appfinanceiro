@@ -109,14 +109,36 @@ export function useLancamento(mes: string, ano: number) {
     const ordem = entradas.length;
     const { data } = await supabase
       .from("entradas")
-      .insert({ user_id: user.id, mes_ano: key, desc: "", tipo: "Honorário – processo", valor: 0, recebido: "Pendente", parcela: "", ordem })
+      .insert({ user_id: user.id, mes_ano: key, desc: "", tipo: "Honorário – processo", valor: 0, recebido: "Pendente", parcela: "", parcelamento_id: null, parcela_num: null, ordem })
       .select().single();
     if (data) setEntradas(prev => [...prev, data as Entrada]);
+  }
+
+  // Mantém parcelas_pagas/situacao do parcelamento em sincronia com os "recebido" das parcelas.
+  async function syncParcelamentoProgress(parcelamentoId: string) {
+    const { count } = await supabase
+      .from("entradas")
+      .select("id", { count: "exact", head: true })
+      .eq("parcelamento_id", parcelamentoId)
+      .eq("recebido", "OK");
+    const pagas = count ?? 0;
+    const { data: parc } = await supabase
+      .from("parcelamentos").select("num_parcelas,situacao").eq("id", parcelamentoId).single();
+    const num = (parc as { num_parcelas?: number } | null)?.num_parcelas ?? 0;
+    const patch: { parcelas_pagas: number; situacao?: string } = { parcelas_pagas: pagas };
+    // Conclui automaticamente quando todas recebidas; reabre se voltar a faltar parcela.
+    if (num > 0 && pagas >= num) patch.situacao = "Concluído";
+    else if ((parc as { situacao?: string } | null)?.situacao === "Concluído") patch.situacao = "Ativo";
+    await supabase.from("parcelamentos").update(patch).eq("id", parcelamentoId);
   }
 
   async function updateEntrada(id: string, field: keyof Entrada, value: unknown) {
     setEntradas(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
     await supabase.from("entradas").update({ [field]: value }).eq("id", id);
+    if (field === "recebido") {
+      const ent = entradas.find(e => e.id === id);
+      if (ent?.parcelamento_id) await syncParcelamentoProgress(ent.parcelamento_id);
+    }
   }
 
   async function deleteEntrada(id: string) {

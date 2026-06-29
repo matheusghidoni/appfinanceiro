@@ -34,6 +34,8 @@ export interface Entrada {
   valor: number;
   recebido: StatusRecebido;
   parcela: string; // ex: "5/10" — usado quando tipo = "Parcelamento cliente"
+  parcelamento_id: string | null; // vínculo ao parcelamento que gerou esta parcela
+  parcela_num: number | null;     // número da parcela (1..N) dentro do parcelamento
   ordem: number;
 }
 
@@ -56,6 +58,7 @@ export interface Parcelamento {
   num_parcelas: number;
   parcelas_pagas: number;
   situacao: StatusParc;
+  mes_inicial: string; // "MM-YYYY" — mês da 1ª parcela; base do auto-lançamento
   created_at: string;
   updated_at: string;
 }

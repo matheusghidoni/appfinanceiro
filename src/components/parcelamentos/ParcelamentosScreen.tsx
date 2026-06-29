@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { brl } from "@/lib/utils";
+import { brl, mesLabel, addMonths } from "@/lib/utils";
 import { useParcelamentos } from "@/hooks/useParcelamentos";
 import { useToast } from "@/components/ui/Toast";
 import ConfirmModal from "@/components/ui/ConfirmModal";
@@ -32,10 +32,10 @@ function Inner() {
   async function handleSave(payload: Omit<Parcelamento, "id"|"user_id"|"created_at"|"updated_at">) {
     if (modalId === "new") {
       await add(payload);
-      toast("Parcelamento adicionado");
+      toast(`Parcelamento adicionado — ${payload.num_parcelas} parcelas lançadas nos meses`);
     } else if (modalId) {
       await update(modalId, payload);
-      toast("Parcelamento atualizado");
+      toast("Parcelamento atualizado — parcelas sincronizadas");
     }
     setModalId(null);
   }
@@ -153,6 +153,12 @@ function progressColor(s: StatusParc) {
   return s === "Inadimplente" ? "#C00000" : s === "Concluído" ? "#2E75B6" : "#70AD47";
 }
 
+// Período coberto pelas parcelas (ex: "jun/26 – mar/27"); vazio se não houver mês inicial.
+function periodo(p: Parcelamento): string {
+  if (!p.mes_inicial) return "";
+  return `${mesLabel(p.mes_inicial)} – ${mesLabel(addMonths(p.mes_inicial, p.num_parcelas - 1))}`;
+}
+
 function ParcelRow({ p, onEdit, onDelete }: {
   p: Parcelamento; onEdit: () => void; onDelete: () => void;
 }) {
@@ -165,7 +171,10 @@ function ParcelRow({ p, onEdit, onDelete }: {
       className="grid grid-cols-[1.4fr_1.6fr_.9fr_.5fr_.5fr_.6fr_.9fr_.9fr_.9fr_.8fr_40px] gap-1.5 px-3.5 py-2 border-b border-border last:border-0 even:bg-roweven hover:bg-rowhover cursor-pointer items-center"
       onClick={onEdit}
     >
-      <span className="font-sans font-semibold text-[13px]">{p.cliente}</span>
+      <span className="font-sans font-semibold text-[13px] leading-tight">
+        {p.cliente}
+        {periodo(p) && <span className="block text-[10px] text-muted font-normal font-mono">{periodo(p)}</span>}
+      </span>
       <span className="font-sans text-[12px] text-muted">{p.desc}</span>
       <span className="font-mono text-[12px]">{brl(p.valor_total)}</span>
       <span className="font-mono text-[12px]">{p.parcelas_pagas}/{p.num_parcelas}</span>
@@ -202,7 +211,7 @@ function ParcelCard({ p, onEdit, onDelete }: {
     <MobileItemCard
       title={p.cliente}
       titlePlaceholder="Sem cliente"
-      subtitle={p.desc || `${p.parcelas_pagas}/${p.num_parcelas} parcelas`}
+      subtitle={[p.desc, periodo(p)].filter(Boolean).join(" · ") || `${p.parcelas_pagas}/${p.num_parcelas} parcelas`}
       value={brl(p.valor_total)}
       chip={p.situacao}
       chipTone={BADGE_TONE[p.situacao] ?? "ok"}

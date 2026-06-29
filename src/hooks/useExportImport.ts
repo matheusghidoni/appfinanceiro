@@ -87,14 +87,15 @@ export function useExportImport() {
 
     // Parcelamentos
     const pRows: unknown[][] = [["CONTROLE DE PARCELAMENTOS"], []];
-    pRows.push(["Cliente","Descrição","Valor Total","Parcelas","Pagas","Restantes","R$/Parcela","Recebido","A Receber","Situação"]);
+    pRows.push(["Cliente","Descrição","1ª Parcela","Valor Total","Parcelas","Pagas","Restantes","R$/Parcela","Recebido","A Receber","Situação"]);
     parcelas.forEach(p => {
       const vp = Number(p.valor_total) / (Number(p.num_parcelas) || 1);
       const rst = Math.max(0, Number(p.num_parcelas) - Number(p.parcelas_pagas));
-      pRows.push([p.cliente, p.desc, p.valor_total, p.num_parcelas, p.parcelas_pagas, rst, vp, vp * Number(p.parcelas_pagas), vp * rst, p.situacao]);
+      const ini = p.mes_inicial ? mesLabel(p.mes_inicial as string) : "";
+      pRows.push([p.cliente, p.desc, ini, p.valor_total, p.num_parcelas, p.parcelas_pagas, rst, vp, vp * Number(p.parcelas_pagas), vp * rst, p.situacao]);
     });
     const wp = XLSX.utils.aoa_to_sheet(pRows);
-    wp["!cols"] = [{wch:22},{wch:22},{wch:14},{wch:10},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14}];
+    wp["!cols"] = [{wch:22},{wch:22},{wch:11},{wch:14},{wch:10},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14}];
     XLSX.utils.book_append_sheet(wb, wp, "PARCELAMENTOS");
 
     XLSX.writeFile(wb, `Controle_Financeiro_${new Date().toISOString().slice(0, 10)}.xlsx`);
@@ -136,12 +137,23 @@ export function useExportImport() {
         ...rest, user_id: user.id,
       }));
 
+    // Parcelamentos preservam o id original para que entradas.parcelamento_id continue válido.
+    const remapParc = (rows: Record<string, unknown>[]) =>
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      rows.map(({ user_id: _uid, created_at: _ca, updated_at: _ua, ...rest }) => ({
+        ...rest, user_id: user.id,
+      }));
+
+    // 1) Parcelamentos primeiro (as entradas têm FK para eles).
+    if (backup.parcelas.length) {
+      await supabase.from("parcelamentos").insert(remapParc(backup.parcelas));
+    }
+    // 2) Demais tabelas. As entradas mantêm parcelamento_id/parcela_num do backup.
     await Promise.all([
       backup.fixos.length    && supabase.from("gastos_fixos").insert(remap(backup.fixos)),
       backup.variados.length && supabase.from("gastos_variados").insert(remap(backup.variados)),
       backup.entradas.length && supabase.from("entradas").insert(remap(backup.entradas)),
       backup.movs.length     && supabase.from("movimentacoes").insert(remap(backup.movs)),
-      backup.parcelas.length && supabase.from("parcelamentos").insert(remap(backup.parcelas)),
     ]);
   }
 

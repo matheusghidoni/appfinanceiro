@@ -12,6 +12,10 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
+const SELECT_CLS = "border-[1.5px] border-border rounded-md px-2 py-1.5 font-sans text-[13px] bg-bg text-apptext w-full outline-none focus:border-accent";
+const INPUT_CLS = "border-[1.5px] border-border rounded-md px-2 py-1.5 font-sans text-[13px] bg-bg text-apptext w-full outline-none focus:border-accent focus:bg-card transition-colors";
+const MONO_CLS = "border-[1.5px] border-border rounded-md px-2 py-1.5 font-mono text-[13px] text-right bg-bg text-apptext w-full outline-none focus:border-accent focus:bg-card transition-colors";
+
 export default function EntradasTable({ rows, onAdd, onUpdate, onDelete }: Props) {
   const subtotal = rows.reduce((s, it) => s + Number(it.valor), 0);
 
@@ -39,58 +43,82 @@ export default function EntradasTable({ rows, onAdd, onUpdate, onDelete }: Props
         {rows.length === 0 && (
           <div className="px-3 py-4 text-sm text-muted text-center">Nenhuma entrada. Clique em + Adicionar.</div>
         )}
-        {rows.map(row => (
-          <div
-            key={row.id}
-            className="grid grid-cols-[1.8fr_1.3fr_.7fr_.9fr_.9fr_32px] px-3 py-2 items-center gap-2 border-b border-border last:border-0 odd:bg-card even:bg-roweven hover:bg-rowhover"
-          >
-            <input
-              key={"d" + row.desc}
-              type="text"
-              placeholder="Cliente / Descrição"
-              defaultValue={row.desc}
-              onBlur={e => onUpdate(row.id, "desc", e.target.value)}
-              className="border-[1.5px] border-border rounded-md px-2 py-1.5 font-sans text-[13px] bg-bg text-apptext w-full outline-none focus:border-accent focus:bg-card transition-colors"
-            />
-            <select
-              key={"t" + row.tipo}
-              defaultValue={row.tipo}
-              onChange={e => onUpdate(row.id, "tipo", e.target.value)}
-              className="border-[1.5px] border-border rounded-md px-2 py-1.5 font-sans text-[13px] bg-bg text-apptext w-full outline-none focus:border-accent"
+        {rows.map(row => {
+          const linked = !!row.parcelamento_id;
+          return (
+            <div
+              key={row.id}
+              className="grid grid-cols-[1.8fr_1.3fr_.7fr_.9fr_.9fr_32px] px-3 py-2 items-center gap-2 border-b border-border last:border-0 odd:bg-card even:bg-roweven hover:bg-rowhover"
             >
-              {TIPOS_ENT.map(t => <option key={t}>{t}</option>)}
-            </select>
-            {row.tipo === TIPO_PARCELAMENTO ? (
-              <input
-                key={"pc" + row.parcela}
-                type="text"
-                placeholder="5/10"
-                defaultValue={row.parcela ?? ""}
-                onBlur={e => onUpdate(row.id, "parcela", e.target.value)}
-                className="border-[1.5px] border-border rounded-md px-2 py-1.5 font-mono text-[13px] text-center bg-bg text-apptext w-full outline-none focus:border-accent focus:bg-card transition-colors"
-              />
-            ) : (
-              <span className="text-center text-[13px] text-muted/50 select-none">—</span>
-            )}
-            <input
-              key={"v" + row.valor}
-              type="text"
-              placeholder="0,00"
-              defaultValue={row.valor > 0 ? String(row.valor) : ""}
-              onBlur={e => onUpdate(row.id, "valor", parseBrl(e.target.value))}
-              className="border-[1.5px] border-border rounded-md px-2 py-1.5 font-mono text-[13px] text-right bg-bg text-apptext w-full outline-none focus:border-accent focus:bg-card transition-colors"
-            />
-            <select
-              key={"r" + row.recebido}
-              defaultValue={row.recebido}
-              onChange={e => onUpdate(row.id, "recebido", e.target.value as StatusRecebido)}
-              className="border-[1.5px] border-border rounded-md px-2 py-1.5 font-sans text-[13px] bg-bg text-apptext w-full outline-none focus:border-accent"
-            >
-              {STATUS_RECEB.map(s => <option key={s}>{s}</option>)}
-            </select>
-            <button onClick={() => onDelete(row.id)} className="text-[#ccc] dark:text-[#4A5568] hover:text-vermelho dark:hover:text-vermelho text-sm flex items-center justify-center transition-colors">✕</button>
-          </div>
-        ))}
+              {linked ? (
+                <span className="flex items-center gap-1.5 text-[13px] truncate" title="Gerado pelo parcelamento — edite na aba Parcelamentos">
+                  <span className="text-fixos">🔗</span>
+                  <span className="truncate">{row.desc}</span>
+                </span>
+              ) : (
+                <input
+                  key={"d" + row.desc}
+                  type="text"
+                  placeholder="Cliente / Descrição"
+                  defaultValue={row.desc}
+                  onBlur={e => onUpdate(row.id, "desc", e.target.value)}
+                  className={INPUT_CLS}
+                />
+              )}
+              {linked ? (
+                <span className="text-[13px] text-muted truncate">{row.tipo}</span>
+              ) : (
+                <select
+                  key={"t" + row.tipo}
+                  defaultValue={row.tipo}
+                  onChange={e => onUpdate(row.id, "tipo", e.target.value)}
+                  className={SELECT_CLS}
+                >
+                  {TIPOS_ENT.map(t => <option key={t}>{t}</option>)}
+                </select>
+              )}
+              {linked ? (
+                <span className="text-center text-[13px] font-mono">{row.parcela}</span>
+              ) : row.tipo === TIPO_PARCELAMENTO ? (
+                <input
+                  key={"pc" + row.parcela}
+                  type="text"
+                  placeholder="5/10"
+                  defaultValue={row.parcela ?? ""}
+                  onBlur={e => onUpdate(row.id, "parcela", e.target.value)}
+                  className="border-[1.5px] border-border rounded-md px-2 py-1.5 font-mono text-[13px] text-center bg-bg text-apptext w-full outline-none focus:border-accent focus:bg-card transition-colors"
+                />
+              ) : (
+                <span className="text-center text-[13px] text-muted/50 select-none">—</span>
+              )}
+              {linked ? (
+                <span className="text-right text-[13px] font-mono">{brl(Number(row.valor))}</span>
+              ) : (
+                <input
+                  key={"v" + row.valor}
+                  type="text"
+                  placeholder="0,00"
+                  defaultValue={row.valor > 0 ? String(row.valor) : ""}
+                  onBlur={e => onUpdate(row.id, "valor", parseBrl(e.target.value))}
+                  className={MONO_CLS}
+                />
+              )}
+              <select
+                key={"r" + row.recebido}
+                defaultValue={row.recebido}
+                onChange={e => onUpdate(row.id, "recebido", e.target.value as StatusRecebido)}
+                className={SELECT_CLS}
+              >
+                {STATUS_RECEB.map(s => <option key={s}>{s}</option>)}
+              </select>
+              {linked ? (
+                <span className="text-[#ccc] dark:text-[#4A5568] text-sm flex items-center justify-center cursor-not-allowed" title="Remova na aba Parcelamentos">🔒</span>
+              ) : (
+                <button onClick={() => onDelete(row.id)} className="text-[#ccc] dark:text-[#4A5568] hover:text-vermelho dark:hover:text-vermelho text-sm flex items-center justify-center transition-colors">✕</button>
+              )}
+            </div>
+          );
+        })}
         <div className="flex justify-between items-center bg-subtotal px-3 py-2 border-t-[1.5px] border-border">
           <span className="text-xs font-bold text-heading">Subtotal</span>
           <span className="font-mono text-sm font-bold text-heading">{brl(subtotal)}</span>
@@ -103,8 +131,9 @@ export default function EntradasTable({ rows, onAdd, onUpdate, onDelete }: Props
           <div className="px-3 py-4 text-sm text-muted text-center">Nenhuma entrada. Toque em + Adicionar.</div>
         )}
         {rows.map(row => {
+          const linked = !!row.parcelamento_id;
           const isParc = row.tipo === TIPO_PARCELAMENTO;
-          const subtitle = isParc && row.parcela
+          const subtitle = (isParc || linked) && row.parcela
             ? `${row.tipo} · ${row.parcela}`
             : row.tipo;
           return (
@@ -118,60 +147,86 @@ export default function EntradasTable({ rows, onAdd, onUpdate, onDelete }: Props
               chipTone={toneForPago(row.recebido)}
               onChipTap={() => cycleRecebido(row)}
               onDelete={() => onDelete(row.id)}
+              disableDelete={linked}
+              badge={linked ? <span className="text-fixos" title="Gerado por parcelamento">🔗</span> : undefined}
             >
-              <CardField label="Descrição / Cliente">
-                <input
-                  key={"d" + row.desc}
-                  type="text"
-                  placeholder="Cliente / Descrição"
-                  defaultValue={row.desc}
-                  onBlur={e => onUpdate(row.id, "desc", e.target.value)}
-                  className={FIELD_CLS}
-                />
-              </CardField>
-              <CardField label="Tipo">
-                <select
-                  key={"t" + row.tipo}
-                  defaultValue={row.tipo}
-                  onChange={e => onUpdate(row.id, "tipo", e.target.value)}
-                  className={FIELD_CLS}
-                >
-                  {TIPOS_ENT.map(t => <option key={t}>{t}</option>)}
-                </select>
-              </CardField>
-              {isParc && (
-                <CardField label="Parcela (ex: 5/10)">
-                  <input
-                    key={"pc" + row.parcela}
-                    type="text"
-                    placeholder="5/10"
-                    defaultValue={row.parcela ?? ""}
-                    onBlur={e => onUpdate(row.id, "parcela", e.target.value)}
-                    className={FIELD_MONO_CLS}
-                  />
-                </CardField>
+              {linked ? (
+                <>
+                  <div className="text-[11px] text-muted bg-bg rounded-md px-2.5 py-2 leading-relaxed">
+                    🔗 Parcela gerada automaticamente pelo parcelamento. Para alterar valor, descrição ou nº de parcelas, edite na aba <strong>Parcelamentos</strong>.
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                    <CardStat label="Parcela" value={row.parcela} />
+                    <CardStat label="Valor" value={brl(Number(row.valor))} />
+                  </div>
+                  <CardField label="Recebido?">
+                    <select
+                      key={"r" + row.recebido}
+                      defaultValue={row.recebido}
+                      onChange={e => onUpdate(row.id, "recebido", e.target.value as StatusRecebido)}
+                      className={FIELD_CLS}
+                    >
+                      {STATUS_RECEB.map(s => <option key={s}>{s}</option>)}
+                    </select>
+                  </CardField>
+                </>
+              ) : (
+                <>
+                  <CardField label="Descrição / Cliente">
+                    <input
+                      key={"d" + row.desc}
+                      type="text"
+                      placeholder="Cliente / Descrição"
+                      defaultValue={row.desc}
+                      onBlur={e => onUpdate(row.id, "desc", e.target.value)}
+                      className={FIELD_CLS}
+                    />
+                  </CardField>
+                  <CardField label="Tipo">
+                    <select
+                      key={"t" + row.tipo}
+                      defaultValue={row.tipo}
+                      onChange={e => onUpdate(row.id, "tipo", e.target.value)}
+                      className={FIELD_CLS}
+                    >
+                      {TIPOS_ENT.map(t => <option key={t}>{t}</option>)}
+                    </select>
+                  </CardField>
+                  {isParc && (
+                    <CardField label="Parcela (ex: 5/10)">
+                      <input
+                        key={"pc" + row.parcela}
+                        type="text"
+                        placeholder="5/10"
+                        defaultValue={row.parcela ?? ""}
+                        onBlur={e => onUpdate(row.id, "parcela", e.target.value)}
+                        className={FIELD_MONO_CLS}
+                      />
+                    </CardField>
+                  )}
+                  <CardField label="Valor (R$)">
+                    <input
+                      key={"v" + row.valor}
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0,00"
+                      defaultValue={row.valor > 0 ? String(row.valor).replace(".", ",") : ""}
+                      onBlur={e => onUpdate(row.id, "valor", parseBrl(e.target.value))}
+                      className={FIELD_MONO_CLS}
+                    />
+                  </CardField>
+                  <CardField label="Recebido?">
+                    <select
+                      key={"r" + row.recebido}
+                      defaultValue={row.recebido}
+                      onChange={e => onUpdate(row.id, "recebido", e.target.value as StatusRecebido)}
+                      className={FIELD_CLS}
+                    >
+                      {STATUS_RECEB.map(s => <option key={s}>{s}</option>)}
+                    </select>
+                  </CardField>
+                </>
               )}
-              <CardField label="Valor (R$)">
-                <input
-                  key={"v" + row.valor}
-                  type="text"
-                  inputMode="decimal"
-                  placeholder="0,00"
-                  defaultValue={row.valor > 0 ? String(row.valor).replace(".", ",") : ""}
-                  onBlur={e => onUpdate(row.id, "valor", parseBrl(e.target.value))}
-                  className={FIELD_MONO_CLS}
-                />
-              </CardField>
-              <CardField label="Recebido?">
-                <select
-                  key={"r" + row.recebido}
-                  defaultValue={row.recebido}
-                  onChange={e => onUpdate(row.id, "recebido", e.target.value as StatusRecebido)}
-                  className={FIELD_CLS}
-                >
-                  {STATUS_RECEB.map(s => <option key={s}>{s}</option>)}
-                </select>
-              </CardField>
             </MobileItemCard>
           );
         })}
@@ -180,6 +235,15 @@ export default function EntradasTable({ rows, onAdd, onUpdate, onDelete }: Props
           <span className="font-mono text-sm font-bold text-heading">{brl(subtotal)}</span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CardStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[11px] text-muted">{label}</span>
+      <span className="font-mono text-[12px] font-semibold">{value}</span>
     </div>
   );
 }
