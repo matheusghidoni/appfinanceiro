@@ -15,6 +15,9 @@ export const TIPOS_ENT = [
   "Honorário – processo","Diligência","Parcelamento cliente","Aluguel de sala","Outros",
 ];
 
+// Tipo de entrada que habilita o campo de parcela (ex: "5/10")
+export const TIPO_PARCELAMENTO = "Parcelamento cliente";
+
 export const TIPOS_MOV = [
   "Retirada da reserva","Depósito na reserva","Aporte externo",
 ] as const;

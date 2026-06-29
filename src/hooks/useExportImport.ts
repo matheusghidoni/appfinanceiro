@@ -61,7 +61,7 @@ export function useExportImport() {
       rows.push(["Subtotal", "", tVr, ""]); rows.push([]);
       rows.push(["ENTRADAS", "", "", ""]);
       rows.push(["Descrição", "Tipo", "Valor (R$)", "Status"]);
-      en.forEach(r => rows.push([r.desc, r.tipo, Number(r.valor), r.recebido]));
+      en.forEach(r => rows.push([r.desc, r.parcela ? `${r.tipo} (${r.parcela})` : r.tipo, Number(r.valor), r.recebido]));
       rows.push(["Total Receita Real", "", tEn, ""]); rows.push([]);
       rows.push(["MOVIMENTAÇÕES", "", "", ""]);
       mv.forEach(r => rows.push([r.desc, r.tipo, Number(r.valor), ""]));

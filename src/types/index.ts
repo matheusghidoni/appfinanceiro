@@ -33,6 +33,7 @@ export interface Entrada {
   tipo: string;
   valor: number;
   recebido: StatusRecebido;
+  parcela: string; // ex: "5/10" — usado quando tipo = "Parcelamento cliente"
   ordem: number;
 }
 

@@ -109,7 +109,7 @@ export function useLancamento(mes: string, ano: number) {
     const ordem = entradas.length;
     const { data } = await supabase
       .from("entradas")
-      .insert({ user_id: user.id, mes_ano: key, desc: "", tipo: "Honorário – processo", valor: 0, recebido: "Pendente", ordem })
+      .insert({ user_id: user.id, mes_ano: key, desc: "", tipo: "Honorário – processo", valor: 0, recebido: "Pendente", parcela: "", ordem })
       .select().single();
     if (data) setEntradas(prev => [...prev, data as Entrada]);
   }

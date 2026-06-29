@@ -32,9 +32,14 @@ CREATE TABLE IF NOT EXISTS entradas (
   tipo       TEXT NOT NULL DEFAULT 'Outros',
   valor      NUMERIC(12,2) NOT NULL DEFAULT 0,
   recebido   TEXT NOT NULL DEFAULT 'Pendente',
+  parcela    TEXT NOT NULL DEFAULT '',
   ordem      INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migração para bancos já existentes: adiciona a coluna "parcela" se ainda não houver.
+-- Seguro rodar várias vezes (idempotente).
+ALTER TABLE entradas ADD COLUMN IF NOT EXISTS parcela TEXT NOT NULL DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS movimentacoes (
   id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
